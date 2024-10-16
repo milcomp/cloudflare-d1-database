@@ -1,10 +1,10 @@
 <?php
 
-namespace Ntanduy\CFD1\D1;
+namespace Milcomp\CFD1\D1;
 
 use Illuminate\Database\SQLiteConnection;
-use Ntanduy\CFD1\CloudflareD1Connector;
-use Ntanduy\CFD1\D1\Pdo\D1Pdo;
+use Milcomp\CFD1\CloudflareD1Connector;
+use Milcomp\CFD1\D1\Pdo\D1Pdo;
 
 class D1Connection extends SQLiteConnection
 {

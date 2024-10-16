@@ -1,5 +1,5 @@
 {
-    "name": "ntanduy/cloudflare-d1-database",
+    "name": "milcomp/cloudflare-d1-database",
     "description": "Easy configuration and setup for D1 Database connections in Laravel.",
     "keywords": [
         "TanDuy03",
@@ -24,18 +24,19 @@
         "illuminate/contracts": "*",
         "illuminate/database": "*",
         "illuminate/http": "*",
-        "saloonphp/laravel-http-sender": "^2.0|^3.0",
+        "saloonphp/laravel-http-sender": "^3.0",
         "saloonphp/laravel-plugin": "^3.5",
-        "saloonphp/saloon": "^3.10"
+        "saloonphp/saloon": "^3.10",
+      "ext-pdo": "Extending the PDO driver for Cloudflare D1 is requireds."
     },
     "autoload": {
         "psr-4": {
-            "Ntanduy\\CFD1\\": "src/"
+            "Milcomp\\CFD1\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Ntanduy\\CFD1\\Test\\": "tests"
+            "Milcomp\\CFD1\\Test\\": "tests"
         }
     },
     "scripts": {
@@ -43,10 +44,9 @@
     },
     "minimum-stability": "stable",
     "require-dev": {
-        "pestphp/pest": "^2.35",
+        "pestphp/pest": "^3.1",
         "orchestra/testbench": "^9.3",
-        "mockery/mockery": "^1.6",
-        "laravel/legacy-factories": "^1.4"
+        "mockery/mockery": "^1.6"
     },
     "config": {
         "allow-plugins": {
@@ -55,12 +55,11 @@
         "sort-packages": true
     },
     "suggest": {
-        "ext-pdo": "Extending the PDO driver for Cloudflare D1 is requireds."
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ntanduy\\CFD1\\D1ServiceProvider"
+                "Milcomp\\CFD1\\D1ServiceProvider"
             ]
         }
     }

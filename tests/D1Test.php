@@ -1,9 +1,9 @@
 <?php
 
-namespace Ntanduy\CFD1\Test;
+namespace Milcomp\CFD1\Test;
 
 use Illuminate\Support\Facades\DB;
-use Ntanduy\CFD1\Test\Models\User;
+use Milcomp\CFD1\Test\Models\User;
 
 class D1Test extends TestCase
 {

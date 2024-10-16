@@ -1,8 +1,8 @@
 <?php
 
-namespace Ntanduy\CFD1\D1\Requests;
+namespace Milcomp\CFD1\D1\Requests;
 
-use Ntanduy\CFD1\CloudflareRequest;
+use Milcomp\CFD1\CloudflareRequest;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Traits\Body\HasJsonBody;

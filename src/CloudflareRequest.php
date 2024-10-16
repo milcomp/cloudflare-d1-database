@@ -1,6 +1,6 @@
 <?php
 
-namespace Ntanduy\CFD1;
+namespace Milcomp\CFD1;
 
 use Saloon\Http\Connector;
 use Saloon\Http\Request;

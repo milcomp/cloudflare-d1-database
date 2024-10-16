@@ -1,7 +1,9 @@
 <?php
 
-namespace Ntanduy\CFD1;
+namespace Milcomp\CFD1;
 
+use Saloon\Exceptions\Request\FatalRequestException;
+use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Response;
 
 class CloudflareD1Connector extends CloudflareConnector
@@ -15,6 +17,10 @@ class CloudflareD1Connector extends CloudflareConnector
         parent::__construct($token, $accountId, $apiUrl);
     }
 
+    /**
+     * @throws FatalRequestException
+     * @throws RequestException
+     */
     public function databaseQuery(string $query, array $params): Response
     {
         return $this->send(

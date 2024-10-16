@@ -1,16 +1,35 @@
 <?php
 
-namespace Ntanduy\CFD1\D1\Pdo;
+namespace Milcomp\CFD1\D1\Pdo;
 
 use Illuminate\Support\Arr;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Saloon\Exceptions\Request\FatalRequestException;
+use Saloon\Exceptions\Request\RequestException;
 
 class D1PdoStatement extends PDOStatement
 {
+    /**
+     * The fetch mode to use when fetching results.
+     *
+     * @var int
+     */
     protected int $fetchMode = PDO::FETCH_ASSOC;
+
+    /**
+     * The parameter bindings for the prepared statement.
+     *
+     * @var array<int|string, mixed>
+     */
     protected array $bindings = [];
+
+    /**
+     * The responses returned from the database query.
+     *
+     * @var array
+     */
     protected array $responses = [];
 
     public function __construct(
@@ -21,14 +40,28 @@ class D1PdoStatement extends PDOStatement
         //
     }
 
-    public function setFetchMode(int $mode, mixed ...$args): bool
+    /**
+     * Sets the default fetch mode for this statement.
+     *
+     * @param int $mode The fetch mode must be one of the PDO::FETCH_* constants.
+     * @return bool True on success, false on failure.
+     */
+    public function setFetchMode($mode, $className = null, ...$params): bool
     {
         $this->fetchMode = $mode;
 
         return true;
     }
 
-    public function bindValue($param, $value, $type = PDO::PARAM_STR): bool
+    /**
+     * Binds a value to a parameter.
+     *
+     * @param mixed $param The parameter identifier.
+     * @param mixed $value The value to bind to the parameter.
+     * @param int $type Explicit data type for the parameter using the PDO::PARAM_* constants.
+     * @return bool True on success or false on failure.
+     */
+    public function bindValue(mixed $param, mixed $value, int $type = PDO::PARAM_STR): bool
     {
         $this->bindings[$param] = match ($type) {
             PDO::PARAM_STR  => (string) $value,
@@ -41,13 +74,19 @@ class D1PdoStatement extends PDOStatement
         return true;
     }
 
+    /**
+     * @throws FatalRequestException
+     * @throws RequestException
+     * @throws \JsonException
+     * @throws PDOException if the query fails.
+     */
     public function execute($params = []): bool
     {
-        $this->bindings = array_values($this->bindings ?: $params);
+        $bindings = array_values(! empty($this->bindings) ? $this->bindings : $params);
 
         $response = $this->pdo->d1()->databaseQuery(
             $this->query,
-            $this->bindings,
+            $bindings,
         );
 
         if ($response->failed() || !$response->json('success')) {
@@ -57,11 +96,15 @@ class D1PdoStatement extends PDOStatement
             );
         }
 
+        // Store the result responses.
         $this->responses = $response->json('result');
 
-        $lastId = Arr::get(Arr::last($this->responses), 'meta.last_row_id', null);
+        // Get the last insert ID if applicable.
+        $lastResponse = end($this->responses);
+        reset($this->responses);
+        $lastId = $lastResponse['meta']['last_row_id'] ?? null;
 
-        if (!in_array($lastId, [0, null])) {
+        if ($lastId !== null && $lastId !== 0) {
             $this->pdo->setLastInsertId(value: $lastId);
         }
 
@@ -70,27 +113,40 @@ class D1PdoStatement extends PDOStatement
 
     public function fetchAll(int $mode = PDO::FETCH_DEFAULT, ...$args): array
     {
-        $response = match ($this->fetchMode) {
+        $fetchMode = $mode === PDO::FETCH_DEFAULT ? $this->fetchMode : $mode;
+
+        return match ($fetchMode) {
             PDO::FETCH_ASSOC => $this->rowsFromResponses(),
-            PDO::FETCH_OBJ   => collect($this->rowsFromResponses())->map(function ($row) {
-                return (object) $row;
-            })->toArray(),
+            PDO::FETCH_OBJ   => array_map(fn($row) => (object) $row, $this->rowsFromResponses()),
             default => throw new PDOException('Unsupported fetch mode.'),
         };
-
-        return $response;
     }
 
+    /**
+     * Returns the number of rows affected by the last SQL statement.
+     *
+     * @return int The number of rows.
+     */
     public function rowCount(): int
     {
         return count($this->rowsFromResponses());
     }
 
+    /**
+     * Extracts and combines the result rows from the responses.
+     *
+     * @return array The combined array of result rows.
+     */
     protected function rowsFromResponses(): array
     {
-        return collect($this->responses)
-            ->map(fn ($response) => $response['results'])
-            ->collapse()
-            ->toArray();
+        $rows = [];
+
+        foreach ($this->responses as $response) {
+            if (isset($response['results']) && is_array($response['results'])) {
+                $rows = array_merge($rows, $response['results']);
+            }
+        }
+
+        return $rows;
     }
 }

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 
-$factory->define(\Ntanduy\CFD1\Test\Models\User::class, function () {
+$factory->define(\Milcomp\CFD1\Test\Models\User::class, function () {
     return [
         'name'           => 'Name'.Str::random(5),
         'email'          => Str::random(5).'@gmail.com',

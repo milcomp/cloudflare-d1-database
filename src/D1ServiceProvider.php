@@ -1,9 +1,9 @@
 <?php
 
-namespace Ntanduy\CFD1;
+namespace Milcomp\CFD1;
 
 use Illuminate\Support\ServiceProvider;
-use Ntanduy\CFD1\D1\D1Connection;
+use Milcomp\CFD1\D1\D1Connection;
 
 class D1ServiceProvider extends ServiceProvider
 {
@@ -12,7 +12,7 @@ class D1ServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }
@@ -22,7 +22,7 @@ class D1ServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->registerD1();
     }
@@ -32,13 +32,13 @@ class D1ServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerD1()
+    protected function registerD1(): void
     {
         $this->app->resolving('db', function ($db) {
             $db->extend('d1', function ($config, $name) {
                 $config['name'] = $name;
 
-                $connection = new D1Connection(
+                return new D1Connection(
                     new CloudflareD1Connector(
                         $config['database'],
                         $config['auth']['token'],
@@ -47,8 +47,6 @@ class D1ServiceProvider extends ServiceProvider
                     ),
                     $config,
                 );
-
-                return $connection;
             });
         });
     }

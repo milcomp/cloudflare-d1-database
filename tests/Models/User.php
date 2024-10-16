@@ -1,6 +1,6 @@
 <?php
 
-namespace Ntanduy\CFD1\Test\Models;
+namespace Milcomp\CFD1\Test\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 

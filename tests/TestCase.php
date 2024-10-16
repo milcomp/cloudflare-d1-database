@@ -1,6 +1,6 @@
 <?php
 
-namespace Ntanduy\CFD1\Test;
+namespace Milcomp\CFD1\Test;
 
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -24,7 +24,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            \Ntanduy\CFD1\D1ServiceProvider::class,
+            \Milcomp\CFD1\D1ServiceProvider::class,
         ];
     }
 

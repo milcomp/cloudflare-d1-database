@@ -1,6 +1,6 @@
 <?php
 
-namespace Ntanduy\CFD1;
+namespace Milcomp\CFD1;
 
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
