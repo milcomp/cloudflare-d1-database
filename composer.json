@@ -27,7 +27,8 @@
         "saloonphp/laravel-http-sender": "^3.0",
         "saloonphp/laravel-plugin": "^3.5",
         "saloonphp/saloon": "^3.10",
-      "ext-pdo": "Extending the PDO driver for Cloudflare D1 is requireds."
+        "ext-pdo": "*",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
