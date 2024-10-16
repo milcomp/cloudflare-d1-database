@@ -16,7 +16,7 @@ This package offers support for:
 ## 🚀 Installation
 
 ```bash
-composer require ntanduy/cloudflare-d1-database
+composer require milcomp/cloudflare-d1-database
 ```
 
 ## 👏 Usage
