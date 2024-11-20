@@ -27,6 +27,11 @@ class D1Connection extends SQLiteConnection
         return $this->withTablePrefix($grammar);
     }
 
+    public function getSchemaBuilder(): D1SchemaBuilder
+    {
+        return new D1SchemaBuilder($this);
+    }
+
     public function d1(): CloudflareD1Connector
     {
         return $this->connector;

@@ -7,6 +7,12 @@ use Illuminate\Support\Str;
 
 class D1SchemaGrammar extends SQLiteGrammar
 {
+    /**
+     * Compile the query to check if a table exists.
+     *
+     * @param string $table
+     * @return string
+     */
     public function compileTableExists($table): string
     {
         return Str::of(parent::compileTableExists($table))
@@ -14,20 +20,33 @@ class D1SchemaGrammar extends SQLiteGrammar
             ->__toString();
     }
 
+    /**
+     * Compile the query to drop all tables.
+     *
+     * @return string
+     */
     public function compileDropAllTables(): string
     {
-        return Str::of(parent::compileDropAllTables())
-            ->replace('sqlite_master', 'sqlite_schema')
-            ->__toString();
+        return "SELECT 'DROP TABLE IF EXISTS \"' || name || '\";' AS drop_statement FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
     }
 
+    /**
+     * Compile the query to drop all views.
+     *
+     * @return string
+     */
     public function compileDropAllViews(): string
     {
-        return Str::of(parent::compileDropAllViews())
-            ->replace('sqlite_master', 'sqlite_schema')
-            ->__toString();
+        return "SELECT 'DROP VIEW IF EXISTS \"' || name || '\";' AS drop_statement FROM sqlite_schema WHERE type = 'view' AND name NOT LIKE 'sqlite_%'";
     }
 
+    /**
+     * Compile the SQL to create a statement.
+     *
+     * @param string $name
+     * @param string $type
+     * @return string
+     */
     public function compileSqlCreateStatement($name, $type = 'table'): string
     {
         return Str::of(parent::compileSqlCreateStatement($name, $type))
@@ -35,17 +54,30 @@ class D1SchemaGrammar extends SQLiteGrammar
             ->__toString();
     }
 
+    /**
+     * Compile the query to retrieve views.
+     *
+     * @return string
+     */
     public function compileViews(): string
     {
-        return Str::of(parent::compileViews())
-            ->replace('sqlite_master', 'sqlite_schema')
-            ->__toString();
+        return "SELECT name FROM sqlite_schema WHERE type = 'view' AND name NOT LIKE 'sqlite_%'";
     }
 
+    /**
+     * Compile the query to retrieve tables.
+     *
+     * @param bool $withSize
+     * @return string
+     */
     public function compileTables($withSize = false): string
     {
-        return Str::of(parent::compileTables($withSize))
-            ->replace('sqlite_master', 'sqlite_schema')
-            ->__toString();
+        $query = "SELECT name FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
+
+        if ($withSize) {
+            $query .= " ORDER BY (SELECT SUM(pgsize) FROM dbstat WHERE name = sqlite_schema.name) DESC";
+        }
+
+        return $query;
     }
 }
