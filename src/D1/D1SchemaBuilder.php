@@ -20,6 +20,68 @@ class D1SchemaBuilder extends SQLiteBuilder
     }
 
     /**
+     * Get all tables and their foreign key dependencies.
+     *
+     * @return array
+     */
+    protected function getTableDependencies(): array
+    {
+        $tables = $this->connection->select(
+            "SELECT name FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf%'"
+        );
+
+        $dependencies = [];
+
+        foreach ($tables as $tableObj) {
+            $table = is_object($tableObj) ? $tableObj->name : $tableObj['name'];
+            $foreignKeys = $this->connection->select(
+                "PRAGMA foreign_key_list({$table})"
+            );
+
+            $dependencies[$table] = array_map(function ($fk) {
+                return $fk['table'];
+            }, $foreignKeys);
+        }
+
+        return $dependencies;
+    }
+
+
+    /**
+     * Perform a topological sort on the table dependencies.
+     *
+     * @param array $dependencies
+     * @return array
+     */
+    protected function topologicalSort(array $dependencies): array
+    {
+        $sorted = [];
+        $visited = [];
+
+        $visit = function ($table) use (&$visit, &$dependencies, &$sorted, &$visited) {
+            if (isset($visited[$table])) {
+                return;
+            }
+
+            $visited[$table] = true;
+
+            if (isset($dependencies[$table])) {
+                foreach ($dependencies[$table] as $dep) {
+                    $visit($dep);
+                }
+            }
+
+            $sorted[] = $table;
+        };
+
+        foreach (array_keys($dependencies) as $table) {
+            $visit($table);
+        }
+
+        return array_reverse($sorted);
+    }
+
+    /**
      * Drop a database from the schema if it exists.
      *
      * @param  string  $name
@@ -31,16 +93,8 @@ class D1SchemaBuilder extends SQLiteBuilder
         return true;
     }
 
-    /**
-     * Drop all tables from the database.
-     *
-     * @return void
-     */
     public function dropAllTables(): void
     {
-        // Disable foreign key constraints
-        $this->connection->statement('PRAGMA foreign_keys = OFF');
-
         // Drop all triggers
         $dropTriggerStatements = $this->connection->select(
             $this->grammar->compileDropAllTriggers()
@@ -61,17 +115,17 @@ class D1SchemaBuilder extends SQLiteBuilder
             $this->connection->statement($sql);
         }
 
-        // Drop all tables
-        $dropTableStatements = $this->connection->select(
-            $this->grammar->compileDropAllTables()
-        );
+        // Get table dependencies
+        $dependencies = $this->getTableDependencies();
 
-        foreach ($dropTableStatements as $statement) {
-            $sql = is_object($statement) ? $statement->tables : $statement['tables'];
+        // Get sorted table list
+        $tablesToDrop = $this->topologicalSort($dependencies);
+
+        // Drop tables in order
+        foreach ($tablesToDrop as $table) {
+            $sql = "DROP TABLE IF EXISTS \"{$table}\";";
             $this->connection->statement($sql);
         }
-
-        $this->connection->statement('PRAGMA foreign_keys = ON');
     }
 
     /**
