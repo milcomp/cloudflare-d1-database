@@ -20,11 +20,28 @@ class D1Connection extends SQLiteConnection
         );
     }
 
+    public function getDriverTitle(): string
+    {
+        return 'D1';
+    }
+
     protected function getDefaultSchemaGrammar()
     {
         ($grammar = new D1SchemaGrammar())->setConnection($this);
 
         return $this->withTablePrefix($grammar);
+    }
+
+    protected function getDefaultQueryGrammar()
+    {
+        ($grammar = new D1SchemaGrammar())->setConnection($this);
+
+        return $this->withTablePrefix(new $grammar);
+    }
+
+    public function getSchemaGrammar()
+    {
+        return $this->withTablePrefix(new D1SchemaGrammar());
     }
 
     public function getSchemaBuilder(): D1SchemaBuilder
