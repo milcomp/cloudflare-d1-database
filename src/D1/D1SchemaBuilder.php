@@ -38,14 +38,40 @@ class D1SchemaBuilder extends SQLiteBuilder
      */
     public function dropAllTables(): void
     {
+        // Disable foreign key constraints
+        $this->connection->statement('PRAGMA foreign_keys = OFF');
+
+        // Drop all triggers
+        $dropTriggerStatements = $this->connection->select(
+            $this->grammar->compileDropAllTriggers()
+        );
+
+        foreach ($dropTriggerStatements as $statement) {
+            $sql = is_object($statement) ? $statement->triggers : $statement['triggers'];
+            $this->connection->statement($sql);
+        }
+
+        // Drop all views
+        $dropViewStatements = $this->connection->select(
+            $this->grammar->compileDropAllViews()
+        );
+
+        foreach ($dropViewStatements as $statement) {
+            $sql = is_object($statement) ? $statement->views : $statement['views'];
+            $this->connection->statement($sql);
+        }
+
+        // Drop all tables
         $dropTableStatements = $this->connection->select(
             $this->grammar->compileDropAllTables()
         );
 
         foreach ($dropTableStatements as $statement) {
-            $sql = is_object($statement) ? $statement->drop_statement : $statement['drop_statement'];
+            $sql = is_object($statement) ? $statement->tables : $statement['tables'];
             $this->connection->statement($sql);
         }
+
+        $this->connection->statement('PRAGMA foreign_keys = ON');
     }
 
     /**
@@ -55,12 +81,13 @@ class D1SchemaBuilder extends SQLiteBuilder
      */
     public function dropAllViews(): void
     {
+        // Drop all views
         $dropViewStatements = $this->connection->select(
             $this->grammar->compileDropAllViews()
         );
 
         foreach ($dropViewStatements as $statement) {
-            $sql = is_object($statement) ? $statement->drop_statement : $statement['drop_statement'];
+            $sql = is_object($statement) ? $statement->views : $statement['views'];
             $this->connection->statement($sql);
         }
     }

@@ -27,7 +27,7 @@ class D1SchemaGrammar extends SQLiteGrammar
      */
     public function compileDropAllTables(): string
     {
-        return "SELECT 'DROP TABLE IF EXISTS \"' || name || '\";' AS drop_statement FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf%'";
+        return "SELECT 'DROP TABLE IF EXISTS \"' || name || '\";' AS tables FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
     }
 
     /**
@@ -37,7 +37,17 @@ class D1SchemaGrammar extends SQLiteGrammar
      */
     public function compileDropAllViews(): string
     {
-        return "SELECT 'DROP VIEW IF EXISTS \"' || name || '\";' AS drop_statement FROM sqlite_schema WHERE type = 'view' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf%'";
+        return "SELECT 'DROP VIEW IF EXISTS \"' || name || '\";' AS views FROM sqlite_schema WHERE type = 'view' AND name NOT LIKE 'sqlite_%'";
+    }
+
+    /**
+     * Compile the query to drop all triggers.
+     *
+     * @return string
+     */
+    public function compileDropAllTriggers(): string
+    {
+        return "SELECT 'DROP TRIGGER IF EXISTS \"' || name || '\";' AS triggers FROM sqlite_schema WHERE type = 'trigger'";
     }
 
     /**
