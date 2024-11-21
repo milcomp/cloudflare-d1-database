@@ -39,7 +39,7 @@ class D1SchemaBuilder extends SQLiteBuilder
             );
 
             $dependencies[$table] = array_map(function ($fk) {
-                return $fk['table'];
+                return is_object($fk) ? $fk->table : $fk['table'];
             }, $foreignKeys);
         }
 
