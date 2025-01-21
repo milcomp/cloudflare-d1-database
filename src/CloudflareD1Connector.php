@@ -6,6 +6,7 @@ use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Http\Response;
 use Saloon\Exceptions\Request\RequestException;
+use Saloon\Traits\Body\HasJsonBody;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Saloon\Traits\Plugins\AlwaysSendsJson;
 use Saloon\Contracts\Body\HasBody;
@@ -17,7 +18,7 @@ use Illuminate\Support\Collection;
 class CloudflareD1Connector extends Connector
 {
     use AcceptsJson;
-    use AlwaysSendsJson;
+    use HasJsonBody;
 
     /**
      * @var array Connection pool
