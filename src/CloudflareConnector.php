@@ -8,9 +8,9 @@ use Saloon\Http\Connector;
 abstract class CloudflareConnector extends Connector
 {
     public function __construct(
-        protected ?string $token = null,
-        public ?string $accountId = null,
-        public string $apiUrl = 'https://api.cloudflare.com/client/v4',
+       #[\SensitiveParameter] protected ?string $token = null,
+       #[\SensitiveParameter] public ?string $accountId = null,
+       #[\SensitiveParameter] public string $apiUrl = 'https://api.cloudflare.com/client/v4',
     ) {
         //
     }

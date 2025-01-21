@@ -8,15 +8,29 @@ use Milcomp\CFD1\D1\Pdo\D1Pdo;
 
 class D1Connection extends SQLiteConnection
 {
-    public function __construct(
-        protected CloudflareD1Connector $connector,
-        protected $config = [],
-    ) {
+    protected CloudflareD1Connector $connector;
+    protected array $config;
+
+    public function __construct(CloudflareD1Connector $connector, array $config = [])
+    {
+        $this->connector = $connector;
+        $this->config = array_merge([
+            'pool_size' => 10,
+            'timeout' => 30,
+            'max_packet_size' => 1048576,
+            'keep_alive' => true
+        ], $config);
+
+        // Configure the connector with our settings
+        $connector->setTimeout($this->config['timeout']);
+        $connector->setMaxPacketSize($this->config['max_packet_size']);
+        $connector->setKeepAlive($this->config['keep_alive']);
+
         parent::__construct(
-            new D1Pdo('sqlite::memory:', $this->connector),
+            new D1Pdo('sqlite::memory:', $connector),
             $config['database'] ?? '',
             $config['prefix'] ?? '',
-            $config,
+            $config
         );
     }
 
@@ -25,25 +39,17 @@ class D1Connection extends SQLiteConnection
         return 'D1';
     }
 
-    protected function getDefaultSchemaGrammar()
-    {
-        ($grammar = new D1SchemaGrammar())->setConnection($this);
-
-        return $this->withTablePrefix($grammar);
-    }
-
-    public function getSchemaGrammar()
-    {
-        return $this->withTablePrefix(new D1SchemaGrammar());
-    }
-
-    public function getSchemaBuilder(): D1SchemaBuilder
-    {
-        return new D1SchemaBuilder($this);
-    }
-
     public function d1(): CloudflareD1Connector
     {
         return $this->connector;
     }
+
+    /**
+     * Get query performance statistics
+     */
+    public function getQueryStats(): array
+    {
+        return $this->connector->getQueryStats();
+    }
 }
+
