@@ -27,7 +27,7 @@ class D1QueryRequest extends CloudflareRequest implements HasBody
     public function resolveEndpoint(): string
     {
         return sprintf(
-            '/accounts/%s/d1/database/%s/query',
+            '/accounts/%s/d1/database/%s/raw',
             $this->connector->accountId,
             $this->database,
         );

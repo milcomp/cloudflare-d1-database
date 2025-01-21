@@ -102,10 +102,6 @@ class D1PdoStatement extends PDOStatement
                 $response = $this->executeOptimizedQuery($this->query, $bindings);
             //}
 
-            if (!$response) {
-                return true; // Query was batched but not yet executed
-            }
-
             if ($response->failed() || !$response->json('success')) {
                 throw new PDOException(
                     (string) $response->json('errors.0.message'),
@@ -237,7 +233,11 @@ class D1PdoStatement extends PDOStatement
         $rows = [];
         foreach ($this->responses as $response) {
             if (isset($response['results']) && is_array($response['results'])) {
-                array_push($rows, ...$response['results']);
+                foreach ($response['results']['rows'] as $row) {
+                    $row = array_combine($response['results']['columns'], $row);
+
+                    $rows[] = $row;
+                }
             }
         }
         return $rows;
