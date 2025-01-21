@@ -9,12 +9,12 @@ use Milcomp\CFD1\D1\Pdo\D1Pdo;
 class D1Connection extends SQLiteConnection
 {
     protected CloudflareD1Connector $connector;
-    protected array $config;
+    protected array $d1config;
 
     public function __construct(CloudflareD1Connector $connector, array $config = [])
     {
         $this->connector = $connector;
-        $this->config = array_merge([
+        $this->d1config = array_merge([
             'pool_size' => 10,
             'timeout' => 30,
             'max_packet_size' => 1048576,
@@ -22,9 +22,9 @@ class D1Connection extends SQLiteConnection
         ], $config);
 
         // Configure the connector with our settings
-        $connector->setTimeout($this->config['timeout']);
-        $connector->setMaxPacketSize($this->config['max_packet_size']);
-        $connector->setKeepAlive($this->config['keep_alive']);
+        $connector->setTimeout($this->d1config['timeout']);
+        $connector->setMaxPacketSize($this->d1config['max_packet_size']);
+        $connector->setKeepAlive($this->d1config['keep_alive']);
 
         parent::__construct(
             new D1Pdo('sqlite::memory:', $connector),
