@@ -8,7 +8,6 @@ use Saloon\Http\Response;
 use Saloon\Exceptions\Request\RequestException;
 use Saloon\Traits\Body\HasJsonBody;
 use Saloon\Traits\Plugins\AcceptsJson;
-use Saloon\Traits\Plugins\AlwaysSendsJson;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Http\PendingRequest;
 use Saloon\Enums\Method;
@@ -124,12 +123,8 @@ class CloudflareD1Connector extends Connector
                 $params
             );
 
-            // Apply optimization options
-            $request->timeout($this->timeout);
-            $request->withHeaders([
-                'CF-D1-Max-Packet-Size' => $this->maxPacketSize,
-                'Connection' => $this->keepAlive ? 'keep-alive' : 'close'
-            ]);
+            $request->headers()->add('CF-D1-Max-Packet-Size', $this->maxPacketSize);
+            $request->headers()->add('Connection', $this->keepAlive ? 'keep-alive' : 'close');
 
             // Track the request
             $requestId = uniqid('req_', true);

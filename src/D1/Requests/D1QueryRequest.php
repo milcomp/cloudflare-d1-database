@@ -6,10 +6,12 @@ use Milcomp\CFD1\CloudflareRequest;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Traits\Body\HasJsonBody;
+use Saloon\Traits\RequestProperties\HasHeaders;
 
 class D1QueryRequest extends CloudflareRequest implements HasBody
 {
     use HasJsonBody;
+    use HasHeaders;
 
     protected Method $method = Method::POST;
 
