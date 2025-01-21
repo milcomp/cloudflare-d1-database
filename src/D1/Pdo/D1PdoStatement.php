@@ -95,12 +95,12 @@ class D1PdoStatement extends PDOStatement
 
         try {
             // Determine if the query can be batched
-            if ($this->shouldBatchQuery($this->query)) {
-                $this->addToBatch($this->query, $bindings);
-                $response = $this->executeBatchIfNeeded();
-            } else {
+            //if ($this->shouldBatchQuery($this->query)) {
+            //    $this->addToBatch($this->query, $bindings);
+            //    $response = $this->executeBatchIfNeeded();
+            //} else {
                 $response = $this->executeOptimizedQuery($this->query, $bindings);
-            }
+            //}
 
             if (!$response) {
                 return true; // Query was batched but not yet executed
