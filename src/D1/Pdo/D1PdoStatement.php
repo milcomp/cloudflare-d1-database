@@ -164,7 +164,7 @@ class D1PdoStatement extends PDOStatement
     /**
      * Execute batch if size limit reached
      */
-    protected function executeBatchIfNeeded(): \Saloon\Http\Response
+    protected function executeBatchIfNeeded(): \Saloon\Http\Response|null
     {
         if (count($this->batchQueries) >= self::MAX_BATCH_SIZE) {
             return $this->executeBatch();
