@@ -4,6 +4,7 @@ namespace Milcomp\CFD1\D1\Pdo;
 
 use Milcomp\CFD1\CloudflareD1Connector;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 /**
@@ -35,7 +36,7 @@ class D1Pdo extends PDO
         protected string $dsn,
         protected CloudflareD1Connector $connector,
     ) {
-        parent::__construct('sqlite::memory:');
+        parent::__construct($dsn);
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
