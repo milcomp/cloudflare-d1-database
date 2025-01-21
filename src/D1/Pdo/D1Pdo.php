@@ -131,4 +131,16 @@ class D1Pdo extends PDO
     {
         return $this->inTransaction;
     }
+
+    public function rollBack(): bool
+    {
+        // If you want to be extra cautious:
+        if (! $this->inTransaction) {
+            // Or return false, though Laravel might interpret false as "failed to roll back"
+            return true;
+        }
+
+        $this->inTransaction = false;
+        return true;
+    }
 }
